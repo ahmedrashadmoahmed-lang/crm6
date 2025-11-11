@@ -1,0 +1,245 @@
+// ==================== فحص شامل في Console ====================
+console.clear();
+console.log('%c🔍 فحص شامل للنظام 🇪🇬', 'color: #3b82f6; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);');
+console.log('═══════════════════════════════════════════════════════════════');
+console.log('📅 التاريخ:', new Date().toLocaleString('ar-EG', { timeZone: 'Africa/Cairo' }));
+console.log('👤 المستخدم: ahmedrashadmoahmed-lang');
+console.log('═══════════════════════════════════════════════════════════════\n');
+
+// ==================== 1. فحص الوحدات ====================
+console.log('%c📦 فحص الوحدات JavaScript', 'color: #8b5cf6; font-size: 18px; font-weight: bold;');
+console.log('───────────────────────────────────────────────────────────────');
+
+const modules = [
+    { name: 'APP_CORE', critical: true },
+    { name: 'APP_AUTH', critical: true },
+    { name: 'APP_PAGES', critical: true },
+    { name: 'APP_SETTINGS', critical: true },
+    { name: 'APP_REAL_DATA', critical: true },
+    { name: 'APP_HELPERS', critical: false },
+    { name: 'APP_SALES', critical: false },
+    { name: 'APP_WORKFLOW', critical: false },
+    { name: 'APP_ACCOUNTING', critical: false },
+    { name: 'APP_MODALS', critical: false },
+    { name: 'APP_PRINT', critical: false },
+    { name: 'APP_CHARTS', critical: false },
+    { name: 'APP_NOTIFICATIONS', critical: false },
+    { name: 'APP_REAL_DATA_EXTENDED', critical: false },
+    { name: 'APP_DASHBOARD_ENHANCED', critical: false },
+    { name: 'APP_PAGES_COMPLETE', critical: false },
+    { name: 'APP_PAGES_FINAL', critical: false }
+];
+
+let loaded = 0;
+let errors = 0;
+let warnings = 0;
+
+modules.forEach(mod => {
+    const exists = typeof window[mod.name] !== 'undefined';
+    if (exists) {
+        console.log(`  ✅ ${mod.name}`);
+        loaded++;
+    } else {
+        if (mod.critical) {
+            console.error(`  ❌ ${mod.name} (حرج)`);
+            errors++;
+        } else {
+            console.warn(`  ⚠️ ${mod.name}`);
+            warnings++;
+        }
+    }
+});
+
+console.log(`\n📊 النتيجة: ${loaded}/${modules.length} محمّل (${((loaded/modules.length)*100).toFixed(1)}%)`);
+console.log(`🔴 أخطاء حرجة: ${errors}`);
+console.log(`🟡 تحذيرات: ${warnings}\n`);
+
+// ==================== 2. فحص البيانات ====================
+console.log('%c💾 فحص البيانات', 'color: #10b981; font-size: 18px; font-weight: bold;');
+console.log('───────────────────────────────────────────────────────────────');
+
+if (typeof APP_CORE !== 'undefined') {
+    const dataKeys = ['customers', 'quotations', 'invoices', 'products', 'suppliers', 'settings'];
+    const dataReport = {};
+    
+    dataKeys.forEach(key => {
+        const data = APP_CORE.getData(key);
+        const count = Array.isArray(data) ? data.length : (data ? 'موجود' : 'فارغ');
+        dataReport[key] = count;
+        console.log(`  ${data ? '✅' : '⚠️'} ${key}: ${count}`);
+    });
+    
+    console.log('\n📈 ملخص البيانات:');
+    console.table(dataReport);
+} else {
+    console.error('  ❌ APP_CORE غير موجود - لا يمكن فحص البيانات');
+}
+
+// ==================== 3. فحص المستخدم ====================
+console.log('\n%c👤 فحص المستخدم الحالي', 'color: #f59e0b; font-size: 18px; font-weight: bold;');
+console.log('───────────────────────────────────────────────────────────────');
+
+if (typeof APP_CORE !== 'undefined' && APP_CORE.appState?.currentUser) {
+    const user = APP_CORE.appState.currentUser;
+    console.log('  ✅ مسجل الدخول');
+    console.log('  👤 الاسم:', user.name);
+    console.log('  📧 البريد:', user.email);
+    console.log('  🎭 الدور:', user.role);
+    console.log('  🏢 القسم:', user.department || 'غير محدد');
+    console.log('\n👤 تفاصيل المستخدم الكاملة:');
+    console.table(user);
+} else {
+    console.warn('  ⏳ لم يتم تسجيل الدخول بعد');
+}
+
+// ==================== 4. فحص الإعدادات ====================
+console.log('\n%c⚙️ فحص الإعدادات المصرية', 'color: #ec4899; font-size: 18px; font-weight: bold;');
+console.log('───────────────────────────────────────────────────────────────');
+
+if (typeof APP_SETTINGS !== 'undefined') {
+    const settings = APP_SETTINGS.getSettings();
+    console.log('  ✅ الإعدادات محملة');
+    console.log('  💰 العملة:', settings.financial?.currency || 'غير محدد');
+    console.log('  💱 سعر الصرف:', settings.financial?.exchangeRate || 'غير محدد');
+    console.log('  📊 الضريبة:', settings.financial?.taxRate + '%' || 'غير محدد');
+    console.log('  🏢 الشركة:', settings.company?.name || 'غير محدد');
+    console.log('\n⚙️ الإعدادات الكاملة:');
+    console.log(settings);
+} else {
+    console.error('  ❌ APP_SETTINGS غير موجود');
+}
+
+// ==================== 5. الإحصائيات المالية ====================
+console.log('\n%c💰 الإحصائيات المالية', 'color: #14b8a6; font-size: 18px; font-weight: bold;');
+console.log('───────────────────────────────────────────────────────────────');
+
+if (typeof APP_REAL_DATA !== 'undefined') {
+    const stats = APP_REAL_DATA.calculateRealStatistics();
+    console.log('  ✅ الإحصائيات محسوبة');
+    console.log('  📊 إجمالي المبيعات:', stats.totalRevenue?.toLocaleString('ar-EG') + ' ج.م');
+    console.log('  💸 التكلفة:', stats.totalCost?.toLocaleString('ar-EG') + ' ج.م');
+    console.log('  💚 صافي الربح:', stats.netProfit?.toLocaleString('ar-EG') + ' ج.م');
+    console.log('  📈 هامش الربح:', stats.profitMargin?.toFixed(2) + '%');
+    console.log('\n💰 الإحصائيات الكاملة:');
+    console.table(stats);
+} else {
+    console.error('  ❌ APP_REAL_DATA غير موجود');
+}
+
+// ==================== 6. فحص LocalStorage ====================
+console.log('\n%c💿 فحص التخزين المحلي', 'color: #6366f1; font-size: 18px; font-weight: bold;');
+console.log('───────────────────────────────────────────────────────────────');
+
+try {
+    const mainData = localStorage.getItem('accounting_pro_eg_v5');
+    const userData = localStorage.getItem('accounting_pro_current_user_v5');
+    
+    if (mainData) {
+        const size = (mainData.length / 1024).toFixed(2);
+        console.log('  ✅ البيانات الرئيسية:', size + ' KB');
+    } else {
+        console.warn('  ⚠️ البيانات الرئيسية غير موجودة');
+    }
+    
+    if (userData) {
+        const size = (userData.length / 1024).toFixed(2);
+        console.log('  ✅ بيانات المستخدم:', size + ' KB');
+    } else {
+        console.warn('  ⚠️ بيانات المستخدم غير موجودة');
+    }
+    
+    const totalSize = ((mainData?.length || 0) + (userData?.length || 0)) / 1024;
+    console.log('  📦 الحجم الإجمالي:', totalSize.toFixed(2) + ' KB');
+} catch (e) {
+    console.error('  ❌ خطأ في LocalStorage:', e.message);
+}
+
+// ==================== 7. فحص المكتبات الخارجية ====================
+console.log('\n%c📚 فحص المكتبات الخارجية', 'color: #f97316; font-size: 18px; font-weight: bold;');
+console.log('───────────────────────────────────────────────────────────────');
+
+const libraries = [
+    { name: 'Chart.js', check: () => typeof Chart !== 'undefined' },
+    { name: 'XLSX', check: () => typeof XLSX !== 'undefined' },
+    { name: 'Tailwind CSS', check: () => !!document.querySelector('script[src*="tailwindcss"]') },
+    { name: 'DaisyUI', check: () => !!document.querySelector('link[href*="daisyui"]') },
+    { name: 'Bootstrap Icons', check: () => !!document.querySelector('link[href*="bootstrap-icons"]') }
+];
+
+libraries.forEach(lib => {
+    if (lib.check()) {
+        console.log(`  ✅ ${lib.name}`);
+    } else {
+        console.warn(`  ⚠️ ${lib.name} - غير محملة`);
+    }
+});
+
+// ==================== 8. التقرير النهائي ====================
+console.log('\n%c📋 التقرير النهائي', 'color: #3b82f6; font-size: 20px; font-weight: bold;');
+console.log('═══════════════════════════════════════════════════════════════');
+
+const successRate = ((loaded / modules.length) * 100).toFixed(1);
+let status = '✅ ممتاز';
+let statusColor = '#10b981';
+
+if (errors > 0) {
+    status = '❌ يوجد أخطاء حرجة';
+    statusColor = '#ef4444';
+} else if (warnings > 3) {
+    status = '⚠️ يوجد تحذيرات';
+    statusColor = '#f59e0b';
+}
+
+console.log(`%c${status}`, `color: ${statusColor}; font-size: 18px; font-weight: bold;`);
+console.log('\n┌─────────────────────────────────────────────┐');
+console.log(`│  📊 معدل النجاح: ${successRate}%`);
+console.log(`│  📦 الوحدات المحملة: ${loaded}/${modules.length}`);
+console.log(`│  🔴 أخطاء حرجة: ${errors}`);
+console.log(`│  🟡 تحذيرات: ${warnings}`);
+console.log('└─────────────────────────────────────────────┘');
+
+if (errors === 0 && warnings === 0) {
+    console.log('\n%c🎉 النظام يعمل بشكل مثالي! 🇪🇬', 'color: #10b981; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);');
+} else if (errors > 0) {
+    console.log('\n%c🔧 يجب إصلاح الأخطاء الحرجة', 'color: #ef4444; font-size: 16px; font-weight: bold;');
+} else {
+    console.log('\n%c✅ النظام يعمل - يوجد تحذيرات بسيطة', 'color: #f59e0b; font-size: 16px; font-weight: bold;');
+}
+
+console.log('\n═══════════════════════════════════════════════════════════════');
+console.log('%c💡 نصيحة: احفظ هذا التقرير للرجوع إليه', 'color: #6366f1; font-size: 14px;');
+console.log('═══════════════════════════════════════════════════════════════\n');
+
+// ==================== تصدير التقرير ====================
+const fullReport = {
+    timestamp: new Date().toISOString(),
+    timestampEgypt: new Date().toLocaleString('ar-EG', { timeZone: 'Africa/Cairo' }),
+    user: 'ahmedrashadmoahmed-lang',
+    system: 'نظام محاسبي برو - مصر v5.0',
+    modules: modules.map(m => ({ 
+        name: m.name, 
+        loaded: typeof window[m.name] !== 'undefined', 
+        critical: m.critical 
+    })),
+    stats: {
+        total: modules.length,
+        loaded: loaded,
+        errors: errors,
+        warnings: warnings,
+        successRate: successRate + '%'
+    },
+    data: typeof APP_CORE !== 'undefined' ? {
+        customers: APP_CORE.getData('customers')?.length || 0,
+        quotations: APP_CORE.getData('quotations')?.length || 0,
+        invoices: APP_CORE.getData('invoices')?.length || 0
+    } : null,
+    user: typeof APP_CORE !== 'undefined' ? APP_CORE.appState?.currentUser : null,
+    settings: typeof APP_SETTINGS !== 'undefined' ? APP_SETTINGS.getSettings() : null
+};
+
+console.log('%c📥 للحصول على التقرير الكامل، اكتب:', 'color: #3b82f6; font-weight: bold;');
+console.log('   copy(fullReport)');
+console.log('%cثم الصقه في ملف نصي', 'color: #6b7280;');
+
+// إتاحة التقرير للنسخ
+window.fullReport = fullReport;
