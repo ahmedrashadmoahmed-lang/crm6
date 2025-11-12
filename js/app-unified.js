@@ -86,23 +86,7 @@ const APP_UNIFIED = (function() {
     function getAllCustomers() {
         const customers = [];
         
-        // عملاء CRM6
-        if (unifiedState.crm6Ready && typeof APP_CORE !== 'undefined') {
-            try {
-                const crm6Customers = APP_CORE.getCustomers() || [];
-                crm6Customers.forEach(customer => {
-                    customers.push({
-                        ...customer,
-                        source: 'crm6',
-                        systemName: 'CRM6 الأصلي'
-                    });
-                });
-            } catch (e) {
-                console.warn('تحذير: لا يمكن جلب عملاء CRM6', e);
-            }
-        }
-        
-        // عملاء النظام المصري
+        // عملاء النظام المصري (الأساسي)
         if (unifiedState.egyptReady && typeof APP_EGYPT_CORE !== 'undefined') {
             try {
                 const egyptCustomers = APP_EGYPT_CORE.getData('customers') || [];
@@ -125,23 +109,7 @@ const APP_UNIFIED = (function() {
     function getAllSales() {
         const sales = [];
         
-        // مبيعات CRM6
-        if (unifiedState.crm6Ready && typeof APP_CORE !== 'undefined') {
-            try {
-                const crm6Sales = APP_CORE.getInvoices() || [];
-                crm6Sales.forEach(sale => {
-                    sales.push({
-                        ...sale,
-                        source: 'crm6',
-                        systemName: 'CRM6'
-                    });
-                });
-            } catch (e) {
-                console.warn('تحذير: لا يمكن جلب مبيعات CRM6', e);
-            }
-        }
-        
-        // مبيعات النظام المصري
+        // مبيعات النظام المصري (الأساسي)
         if (unifiedState.egyptReady && typeof APP_EGYPT_CORE !== 'undefined') {
             try {
                 const egyptSales = APP_EGYPT_CORE.getData('sales') || [];
@@ -164,23 +132,7 @@ const APP_UNIFIED = (function() {
     function getAllSuppliers() {
         const suppliers = [];
         
-        // موردين CRM6
-        if (unifiedState.crm6Ready && typeof APP_CORE !== 'undefined') {
-            try {
-                const crm6Suppliers = APP_CORE.getSuppliers() || [];
-                crm6Suppliers.forEach(supplier => {
-                    suppliers.push({
-                        ...supplier,
-                        source: 'crm6',
-                        systemName: 'CRM6'
-                    });
-                });
-            } catch (e) {
-                console.warn('تحذير: لا يمكن جلب موردين CRM6', e);
-            }
-        }
-        
-        // موردين النظام المصري
+        // موردين النظام المصري (الأساسي)
         if (unifiedState.egyptReady && typeof APP_EGYPT_CORE !== 'undefined') {
             try {
                 const egyptSuppliers = APP_EGYPT_CORE.getData('suppliers') || [];
@@ -232,20 +184,16 @@ const APP_UNIFIED = (function() {
         const stats = {
             customers: {
                 total: 0,
-                crm6: 0,
                 egypt: 0
             },
             sales: {
                 total: 0,
                 totalAmount: 0,
-                crm6Count: 0,
                 egyptCount: 0,
-                crm6Amount: 0,
                 egyptAmount: 0
             },
             suppliers: {
                 total: 0,
-                crm6: 0,
                 egypt: 0
             },
             purchases: {
@@ -261,22 +209,18 @@ const APP_UNIFIED = (function() {
         // إحصائيات العملاء
         const customers = getAllCustomers();
         stats.customers.total = customers.length;
-        stats.customers.crm6 = customers.filter(c => c.source === 'crm6').length;
         stats.customers.egypt = customers.filter(c => c.source === 'egypt').length;
         
         // إحصائيات المبيعات
         const sales = getAllSales();
         stats.sales.total = sales.length;
-        stats.sales.crm6Count = sales.filter(s => s.source === 'crm6').length;
         stats.sales.egyptCount = sales.filter(s => s.source === 'egypt').length;
         
         // حساب إجمالي المبيعات
         sales.forEach(sale => {
             const amount = sale.total || sale.totalAmount || 0;
             stats.sales.totalAmount += amount;
-            if (sale.source === 'crm6') {
-                stats.sales.crm6Amount += amount;
-            } else {
+            if (sale.source === 'egypt') {
                 stats.sales.egyptAmount += amount;
             }
         });
@@ -284,7 +228,6 @@ const APP_UNIFIED = (function() {
         // إحصائيات الموردين
         const suppliers = getAllSuppliers();
         stats.suppliers.total = suppliers.length;
-        stats.suppliers.crm6 = suppliers.filter(s => s.source === 'crm6').length;
         stats.suppliers.egypt = suppliers.filter(s => s.source === 'egypt').length;
         
         // إحصائيات المشتريات (النظام المصري فقط)

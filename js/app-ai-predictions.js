@@ -76,7 +76,7 @@ const APP_AI_PREDICTIONS = (function() {
         
         const predictions = [];
         for (let i = 1; i <= months; i++) {
-            const predictedSales = salesPrediction && salesPrediction.predictions[i - 1] 
+            const predictedSales = salesPrediction && salesPrediction.predictions && salesPrediction.predictions[i - 1] 
                 ? salesPrediction.predictions[i - 1].predicted 
                 : currentInflow / 3;
             
