@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 لوحة التحكم الذكية - نظام AI</title>
+    
+    <!-- TailwindCSS & DaisyUI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .ai-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .ai-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body class="rtl bg-gray-50">
+
+    <!-- Navigation -->
+    <nav class="navbar gradient-bg text-white shadow-xl sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex-1">
+                <a href="egypt-dashboard.html" class="btn btn-ghost normal-case text-xl">
+                    <i class="bi bi-arrow-right"></i>
+                    <span class="mr-2">عودة إلى النظام</span>
+                </a>
+            </div>
+            <div class="flex-none">
+                <h1 class="text-2xl font-bold flex items-center gap-2">
+                    <i class="bi bi-robot"></i>
+                    لوحة التحكم الذكية AI
+                </h1>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div class="text-center">
+            <div class="w-24 h-24 border-8 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+            <h2 class="text-2xl font-bold text-purple-600 mb-2">🤖 جاري تحليل البيانات...</h2>
+            <p class="text-gray-600">محرك الذكاء الاصطناعي يعمل</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8" id="main-content" style="display: none;">
+        
+        <!-- Hero Section -->
+        <div class="hero gradient-bg rounded-3xl p-8 mb-8 text-white">
+            <div class="hero-content text-center">
+                <div class="max-w-4xl">
+                    <h1 class="text-5xl font-bold mb-4">🤖 الذكاء الاصطناعي لنظام CRM6</h1>
+                    <p class="text-xl opacity-90 mb-6">
+                        تحليلات متقدمة، توصيات ذكية، وتنبؤات دقيقة لتحسين أعمالك
+                    </p>
+                    <div class="flex gap-4 justify-center">
+                        <div class="stat bg-white/20 rounded-xl">
+                            <div class="stat-value text-white" id="ai-score">0</div>
+                            <div class="stat-title text-white/80">نقاط AI</div>
+                        </div>
+                        <div class="stat bg-white/20 rounded-xl">
+                            <div class="stat-value text-white" id="insights-count">0</div>
+                            <div class="stat-title text-white/80">رؤى ذكية</div>
+                        </div>
+                        <div class="stat bg-white/20 rounded-xl">
+                            <div class="stat-value text-white" id="opportunities-count">0</div>
+                            <div class="stat-title text-white/80">فرص تجارية</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="ai-card card bg-white shadow-lg">
+                <div class="card-body">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm opacity-60">عملاء VIP</p>
+                            <h3 class="text-3xl font-bold text-purple-600" id="vip-customers">0</h3>
+                        </div>
+                        <div class="text-5xl">👑</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ai-card card bg-white shadow-lg">
+                <div class="card-body">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm opacity-60">المبيعات المتوقعة</p>
+                            <h3 class="text-2xl font-bold text-green-600" id="predicted-sales">0</h3>
+                        </div>
+                        <div class="text-5xl">📈</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ai-card card bg-white shadow-lg">
+                <div class="card-body">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm opacity-60">فرص ساخنة</p>
+                            <h3 class="text-3xl font-bold text-orange-600" id="hot-opportunities">0</h3>
+                        </div>
+                        <div class="text-5xl">🔥</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ai-card card bg-white shadow-lg">
+                <div class="card-body">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm opacity-60">توصيات عاجلة</p>
+                            <h3 class="text-3xl font-bold text-red-600" id="urgent-recommendations">0</h3>
+                        </div>
+                        <div class="text-5xl">⚡</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Sections -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            
+            <!-- Customer Analysis -->
+            <div class="card bg-white shadow-xl">
+                <div class="card-body">
+                    <h2 class="card-title text-2xl mb-4">
+                        <i class="bi bi-people text-purple-600"></i>
+                        تحليل العملاء الذكي
+                    </h2>
+                    <div id="customer-analysis"></div>
+                    <canvas id="customer-chart" height="200"></canvas>
+                </div>
+            </div>
+            
+            <!-- Supplier Analysis -->
+            <div class="card bg-white shadow-xl">
+                <div class="card-body">
+                    <h2 class="card-title text-2xl mb-4">
+                        <i class="bi bi-truck text-blue-600"></i>
+                        تحليل الموردين الذكي
+                    </h2>
+                    <div id="supplier-analysis"></div>
+                    <canvas id="supplier-chart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="card bg-white shadow-xl mb-8">
+            <div class="card-body">
+                <h2 class="card-title text-2xl mb-4">
+                    <i class="bi bi-lightbulb text-yellow-600"></i>
+                    التوصيات الذكية
+                </h2>
+                <div id="recommendations-list"></div>
+            </div>
+        </div>
+
+        <!-- Opportunities -->
+        <div class="card bg-white shadow-xl mb-8">
+            <div class="card-body">
+                <h2 class="card-title text-2xl mb-4">
+                    <i class="bi bi-target text-orange-600"></i>
+                    الفرص التجارية
+                </h2>
+                <div id="opportunities-list"></div>
+            </div>
+        </div>
+
+        <!-- Predictions -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            
+            <!-- Sales Prediction -->
+            <div class="card bg-white shadow-xl">
+                <div class="card-body">
+                    <h2 class="card-title text-2xl mb-4">
+                        <i class="bi bi-graph-up-arrow text-green-600"></i>
+                        التنبؤ بالمبيعات
+                    </h2>
+                    <canvas id="sales-prediction-chart" height="250"></canvas>
+                </div>
+            </div>
+            
+            <!-- Cash Flow Prediction -->
+            <div class="card bg-white shadow-xl">
+                <div class="card-body">
+                    <h2 class="card-title text-2xl mb-4">
+                        <i class="bi bi-cash-coin text-blue-600"></i>
+                        التنبؤ بالتدفق النقدي
+                    </h2>
+                    <canvas id="cashflow-prediction-chart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/app-core.js"></script>
+    <script src="js/app-egypt-core.js"></script>
+    <script src="js/app-egypt-tax.js"></script>
+    <script src="js/app-egypt-sales.js"></script>
+    <script src="js/app-egypt-purchases.js"></script>
+    <script src="js/app-egypt-customers.js"></script>
+    <script src="js/app-egypt-suppliers.js"></script>
+    
+    <!-- AI Scripts -->
+    <script src="js/app-unified.js"></script>
+    <script src="js/app-ai-engine.js"></script>
+    <script src="js/app-ai-analysis.js"></script>
+    <script src="js/ai/customer-scoring.js"></script>
+    <script src="js/ai/supplier-scoring.js"></script>
+    <script src="js/ai/pricing-optimizer.js"></script>
+    <script src="js/ai/opportunity-finder.js"></script>
+    <script src="js/app-ai-recommendations.js"></script>
+    <script src="js/app-ai-predictions.js"></script>
+
+    <script>
+    (function() {
+        'use strict';
+
+        console.log('%c🤖 لوحة التحكم الذكية AI', 'color: #667eea; font-size: 20px; font-weight: bold;');
+
+        // Initialize systems
+        setTimeout(() => {
+            try {
+                // Initialize core systems
+                if (typeof APP_EGYPT_CORE !== 'undefined') {
+                    APP_EGYPT_CORE.initialize();
+                }
+
+                if (typeof APP_UNIFIED !== 'undefined') {
+                    APP_UNIFIED.initialize();
+                }
+
+                if (typeof APP_AI_ENGINE !== 'undefined') {
+                    APP_AI_ENGINE.initialize();
+                }
+
+                // Load and display AI insights
+                loadAIDashboard();
+
+                // Hide loading screen
+                document.getElementById('loading-screen').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+
+            } catch (e) {
+                console.error('خطأ في تهيئة النظام:', e);
+                alert('حدث خطأ في تحميل لوحة التحكم الذكية');
+            }
+        }, 2000);
+
+        function loadAIDashboard() {
+            // Customer Analysis
+            if (typeof APP_AI_ANALYSIS !== 'undefined') {
+                const customerAnalysis = APP_AI_ANALYSIS.analyzeCustomers();
+                displayCustomerAnalysis(customerAnalysis);
+                
+                const supplierAnalysis = APP_AI_ANALYSIS.analyzeSuppliers();
+                displaySupplierAnalysis(supplierAnalysis);
+            }
+
+            // Recommendations
+            if (typeof APP_AI_RECOMMENDATIONS !== 'undefined') {
+                const recommendations = APP_AI_RECOMMENDATIONS.generateAllRecommendations();
+                displayRecommendations(recommendations);
+            }
+
+            // Opportunities
+            if (typeof AI_OPPORTUNITY_FINDER !== 'undefined') {
+                const opportunities = AI_OPPORTUNITY_FINDER.findAllOpportunities();
+                displayOpportunities(opportunities);
+                
+                // Update stats
+                document.getElementById('opportunities-count').textContent = opportunities.total;
+                document.getElementById('hot-opportunities').textContent = 
+                    opportunities.all.filter(o => o.priority === 'high' || o.priority === 'urgent').length;
+            }
+
+            // Predictions
+            if (typeof APP_AI_PREDICTIONS !== 'undefined') {
+                const salesPrediction = APP_AI_PREDICTIONS.predictSales('monthly', 3);
+                if (salesPrediction && !salesPrediction.error) {
+                    displaySalesPrediction(salesPrediction);
+                    document.getElementById('predicted-sales').textContent = 
+                        formatCurrency(salesPrediction.predictions[0].predicted);
+                }
+
+                const cashflowPrediction = APP_AI_PREDICTIONS.predictCashFlow(3);
+                if (cashflowPrediction) {
+                    displayCashFlowPrediction(cashflowPrediction);
+                }
+            }
+        }
+
+        function displayCustomerAnalysis(analysis) {
+            if (!analysis || analysis.total === 0) {
+                document.getElementById('customer-analysis').innerHTML = 
+                    '<p class="text-gray-500">لا توجد بيانات كافية</p>';
+                return;
+            }
+
+            // Update stats
+            document.getElementById('vip-customers').textContent = analysis.summary.vip;
+            
+            // Display summary
+            const html = `
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="stat bg-purple-50 rounded-lg p-3">
+                        <div class="stat-value text-purple-600">${analysis.summary.vip}</div>
+                        <div class="stat-title">👑 VIP</div>
+                    </div>
+                    <div class="stat bg-green-50 rounded-lg p-3">
+                        <div class="stat-value text-green-600">${analysis.summary.active}</div>
+                        <div class="stat-title">✅ نشط</div>
+                    </div>
+                    <div class="stat bg-yellow-50 rounded-lg p-3">
+                        <div class="stat-value text-yellow-600">${analysis.summary.sleeping}</div>
+                        <div class="stat-title">😴 خامل</div>
+                    </div>
+                    <div class="stat bg-red-50 rounded-lg p-3">
+                        <div class="stat-value text-red-600">${analysis.summary.risky}</div>
+                        <div class="stat-title">⚠️ محفوف بالمخاطر</div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('customer-analysis').innerHTML = html;
+
+            // Create chart
+            const ctx = document.getElementById('customer-chart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['VIP', 'نشط', 'خامل', 'محفوف بالمخاطر'],
+                        datasets: [{
+                            data: [
+                                analysis.summary.vip,
+                                analysis.summary.active,
+                                analysis.summary.sleeping,
+                                analysis.summary.risky
+                            ],
+                            backgroundColor: ['#9333ea', '#10b981', '#f59e0b', '#ef4444']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function displaySupplierAnalysis(analysis) {
+            if (!analysis || analysis.total === 0) {
+                document.getElementById('supplier-analysis').innerHTML = 
+                    '<p class="text-gray-500">لا توجد بيانات كافية</p>';
+                return;
+            }
+
+            // Count by category
+            const categories = { excellent: 0, good: 0, average: 0, poor: 0 };
+            analysis.analyzed.forEach(s => {
+                const cat = s.category.name.toLowerCase();
+                categories[cat] = (categories[cat] || 0) + 1;
+            });
+
+            const html = `
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="stat bg-yellow-50 rounded-lg p-3">
+                        <div class="stat-value text-yellow-600">${categories.excellent}</div>
+                        <div class="stat-title">⭐ ممتاز</div>
+                    </div>
+                    <div class="stat bg-green-50 rounded-lg p-3">
+                        <div class="stat-value text-green-600">${categories.good}</div>
+                        <div class="stat-title">✅ جيد</div>
+                    </div>
+                    <div class="stat bg-blue-50 rounded-lg p-3">
+                        <div class="stat-value text-blue-600">${categories.average}</div>
+                        <div class="stat-title">⚡ متوسط</div>
+                    </div>
+                    <div class="stat bg-red-50 rounded-lg p-3">
+                        <div class="stat-value text-red-600">${categories.poor}</div>
+                        <div class="stat-title">⚠️ ضعيف</div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('supplier-analysis').innerHTML = html;
+
+            // Create chart
+            const ctx = document.getElementById('supplier-chart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['ممتاز', 'جيد', 'متوسط', 'ضعيف'],
+                        datasets: [{
+                            data: [categories.excellent, categories.good, categories.average, categories.poor],
+                            backgroundColor: ['#eab308', '#10b981', '#3b82f6', '#ef4444']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function displayRecommendations(recommendations) {
+            const urgent = recommendations.all.filter(r => r.priority === 'urgent').length;
+            document.getElementById('urgent-recommendations').textContent = urgent;
+            document.getElementById('ai-score').textContent = recommendations.total;
+
+            let html = '';
+            recommendations.top10.forEach(rec => {
+                const priorityColors = {
+                    urgent: 'bg-red-100 border-red-300',
+                    high: 'bg-orange-100 border-orange-300',
+                    medium: 'bg-yellow-100 border-yellow-300',
+                    low: 'bg-blue-100 border-blue-300'
+                };
+                
+                html += `
+                    <div class="alert ${priorityColors[rec.priority]} border-2 mb-3">
+                        <div>
+                            <div class="text-2xl">${rec.icon}</div>
+                            <div>
+                                <h3 class="font-bold">${rec.title}</h3>
+                                <div class="text-sm">${rec.description}</div>
+                                ${rec.actions ? `<ul class="text-xs mt-2">
+                                    ${rec.actions.map(action => `<li>• ${action}</li>`).join('')}
+                                </ul>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('recommendations-list').innerHTML = html || '<p class="text-gray-500">لا توجد توصيات حالياً</p>';
+        }
+
+        function displayOpportunities(opportunities) {
+            document.getElementById('insights-count').textContent = opportunities.total;
+
+            let html = '';
+            opportunities.top10.forEach(opp => {
+                const priorityColors = {
+                    urgent: 'badge-error',
+                    high: 'badge-warning',
+                    medium: 'badge-info',
+                    low: 'badge-ghost'
+                };
+
+                html += `
+                    <div class="card bg-base-100 border-2 mb-4">
+                        <div class="card-body p-4">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-lg">${opp.customer.name}</h3>
+                                    <span class="badge ${priorityColors[opp.priority]}">${opp.typeAr}</span>
+                                    <p class="text-sm mt-2">${opp.reason}</p>
+                                    <p class="text-sm font-bold text-green-600 mt-1">
+                                        القيمة المتوقعة: ${formatCurrency(opp.expectedValue)}
+                                    </p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl mb-2">🎯</div>
+                                    <div class="badge badge-primary">${Math.round(opp.probability * 100)}%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('opportunities-list').innerHTML = html || '<p class="text-gray-500">لا توجد فرص حالياً</p>';
+        }
+
+        function displaySalesPrediction(prediction) {
+            const ctx = document.getElementById('sales-prediction-chart');
+            if (!ctx) return;
+
+            const labels = prediction.predictions.map(p => p.date);
+            const data = prediction.predictions.map(p => p.predicted);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'المبيعات المتوقعة',
+                        data: data,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: true
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return formatCurrency(context.parsed.y);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function displayCashFlowPrediction(prediction) {
+            const ctx = document.getElementById('cashflow-prediction-chart');
+            if (!ctx) return;
+
+            const labels = prediction.predictions.map(p => p.date);
+            const inflow = prediction.predictions.map(p => p.inflow);
+            const outflow = prediction.predictions.map(p => p.outflow);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'تدفقات داخلة',
+                            data: inflow,
+                            backgroundColor: '#10b981'
+                        },
+                        {
+                            label: 'تدفقات خارجة',
+                            data: outflow,
+                            backgroundColor: '#ef4444'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('ar-EG', {
+                style: 'currency',
+                currency: 'EGP',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+    })();
+    </script>
+
+</body>
+</html>
