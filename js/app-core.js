@@ -123,7 +123,11 @@ const APP_CORE = (function() {
             
             setTimeout(() => {
                 hideLoadingScreen();
-                APP_AUTH.checkLoginStatus();
+                if (typeof APP_AUTH !== 'undefined' && APP_AUTH) {
+                    APP_AUTH.checkLoginStatus();
+                } else {
+                    console.warn('⚠️ APP_AUTH is not available, skipping authentication check');
+                }
             }, 500);
         }, 1200);
     }
