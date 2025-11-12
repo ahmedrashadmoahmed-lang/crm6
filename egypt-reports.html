@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🇪🇬 التقارير المالية - نظام محاسبي مصري</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body class="rtl bg-gray-50">
+
+    <!-- Navigation -->
+    <nav class="navbar bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-xl sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex-1">
+                <a href="egypt-dashboard.html" class="btn btn-ghost normal-case text-xl">
+                    <i class="bi bi-calculator"></i>
+                    <span class="mr-2">نظام محاسبي مصري 🇪🇬</span>
+                </a>
+            </div>
+            <div class="flex-none">
+                <ul class="menu menu-horizontal px-1">
+                    <li><a href="egypt-dashboard.html"><i class="bi bi-speedometer2"></i> لوحة التحكم</a></li>
+                    <li><a href="egypt-sales.html"><i class="bi bi-cart-check"></i> المبيعات</a></li>
+                    <li><a href="egypt-purchases.html"><i class="bi bi-bag"></i> المشتريات</a></li>
+                    <li><a href="egypt-expenses.html"><i class="bi bi-cash-coin"></i> المصروفات</a></li>
+                    <li><a href="egypt-reports.html" class="active"><i class="bi bi-file-earmark-text"></i> التقارير</a></li>
+                </ul>
+                <button class="btn btn-sm btn-ghost" onclick="APP_EGYPT_IMPORT.showImportDialog()">
+                    <i class="bi bi-download"></i>
+                    استيراد
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="space-y-6">
+            <!-- Header -->
+            <div>
+                <h1 class="text-3xl font-bold">📊 التقارير المالية</h1>
+                <p class="text-gray-600 mt-1">التقارير المالية الشاملة للعام 2025</p>
+            </div>
+
+            <!-- Report Type Tabs -->
+            <div class="tabs tabs-boxed bg-white shadow-lg p-2">
+                <a class="tab tab-active" data-tab="income" onclick="showReport('income')">
+                    <i class="bi bi-graph-up"></i>
+                    قائمة الدخل
+                </a>
+                <a class="tab" data-tab="balance" onclick="showReport('balance')">
+                    <i class="bi bi-balance-scale"></i>
+                    الميزانية
+                </a>
+                <a class="tab" data-tab="tax" onclick="showReport('tax')">
+                    <i class="bi bi-receipt-cutoff"></i>
+                    تقرير الضرائب
+                </a>
+                <a class="tab" data-tab="cashflow" onclick="showReport('cashflow')">
+                    <i class="bi bi-cash-stack"></i>
+                    التدفق النقدي
+                </a>
+            </div>
+
+            <!-- Income Statement Report -->
+            <div id="report-income" class="report-section">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">قائمة الدخل لعام 2025</h2>
+                    <button class="btn btn-success" onclick="APP_EGYPT_REPORTS.exportToExcel('income', 2025)">
+                        <i class="bi bi-file-earmark-excel"></i>
+                        تصدير Excel
+                    </button>
+                </div>
+                <div id="income-statement-content"></div>
+            </div>
+
+            <!-- Balance Sheet Report -->
+            <div id="report-balance" class="report-section" style="display:none;">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">الميزانية العمومية</h2>
+                    <button class="btn btn-success" onclick="APP_EGYPT_REPORTS.exportToExcel('balance')">
+                        <i class="bi bi-file-earmark-excel"></i>
+                        تصدير Excel
+                    </button>
+                </div>
+                <div id="balance-sheet-content"></div>
+            </div>
+
+            <!-- Tax Report -->
+            <div id="report-tax" class="report-section" style="display:none;">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">تقرير الضرائب لعام 2025</h2>
+                    <button class="btn btn-success" onclick="APP_EGYPT_REPORTS.exportToExcel('tax', 2025)">
+                        <i class="bi bi-file-earmark-excel"></i>
+                        تصدير Excel
+                    </button>
+                </div>
+                <div id="tax-report-content"></div>
+            </div>
+
+            <!-- Cash Flow Report -->
+            <div id="report-cashflow" class="report-section" style="display:none;">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">قائمة التدفق النقدي لعام 2025</h2>
+                    <button class="btn btn-success" onclick="alert('تصدير Excel - قيد التطوير')">
+                        <i class="bi bi-file-earmark-excel"></i>
+                        تصدير Excel
+                    </button>
+                </div>
+                <div id="cashflow-content"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer footer-center p-10 bg-base-200 text-base-content mt-12">
+        <div>
+            <p class="font-bold">نظام محاسبي مصري متكامل - CRM6 🇪🇬</p>
+            <p>© 2025 - جميع الحقوق محفوظة</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Files -->
+    <script src="js/app-egypt-core.js"></script>
+    <script src="js/app-egypt-tax.js"></script>
+    <script src="js/app-egypt-sales.js"></script>
+    <script src="js/app-egypt-purchases.js"></script>
+    <script src="js/app-egypt-customers.js"></script>
+    <script src="js/app-egypt-suppliers.js"></script>
+    <script src="js/app-egypt-expenses.js"></script>
+    <script src="js/app-egypt-guarantees.js"></script>
+    <script src="js/app-egypt-cashbox.js"></script>
+    <script src="js/app-egypt-payroll.js"></script>
+    <script src="js/app-egypt-reports.js"></script>
+    <script src="js/app-egypt-import.js"></script>
+
+    <script>
+    (function() {
+        'use strict';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📊 تحميل صفحة التقارير...');
+            
+            try {
+                // Initialize all modules
+                APP_EGYPT_CORE.initialize();
+                APP_EGYPT_SALES.initialize();
+                APP_EGYPT_PURCHASES.initialize();
+                APP_EGYPT_CUSTOMERS.initialize();
+                APP_EGYPT_SUPPLIERS.initialize();
+                APP_EGYPT_EXPENSES.initialize();
+                APP_EGYPT_GUARANTEES.initialize();
+                APP_EGYPT_CASHBOX.initialize();
+                APP_EGYPT_PAYROLL.initialize();
+                
+                // Render default report (Income Statement)
+                renderIncomeStatement();
+                
+                console.log('✅ تم تحميل التقارير بنجاح');
+                
+            } catch (error) {
+                console.error('❌ خطأ:', error);
+            }
+        });
+        
+        window.showReport = function(reportType) {
+            // Hide all reports
+            document.querySelectorAll('.report-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Update tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('tab-active');
+            });
+            
+            // Show selected report
+            const reportElement = document.getElementById(`report-${reportType}`);
+            if (reportElement) {
+                reportElement.style.display = 'block';
+            }
+            
+            // Activate tab
+            const tabElement = document.querySelector(`[data-tab="${reportType}"]`);
+            if (tabElement) {
+                tabElement.classList.add('tab-active');
+            }
+            
+            // Render report if not already rendered
+            switch(reportType) {
+                case 'income':
+                    renderIncomeStatement();
+                    break;
+                case 'balance':
+                    renderBalanceSheet();
+                    break;
+                case 'tax':
+                    renderTaxReport();
+                    break;
+                case 'cashflow':
+                    renderCashFlowReport();
+                    break;
+            }
+        };
+        
+        function renderIncomeStatement() {
+            APP_EGYPT_REPORTS.renderIncomeStatement('income-statement-content', 2025);
+        }
+        
+        function renderBalanceSheet() {
+            const balance = APP_EGYPT_REPORTS.generateBalanceSheet();
+            const container = document.getElementById('balance-sheet-content');
+            
+            const html = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Assets -->
+                    <div class="card bg-white shadow-xl">
+                        <div class="card-body">
+                            <h3 class="card-title text-xl mb-4 text-success">الأصول</h3>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <h4 class="font-bold mb-2">الأصول المتداولة</h4>
+                                    <div class="space-y-1 text-sm">
+                                        <div class="flex justify-between">
+                                            <span>النقدية</span>
+                                            <span>${APP_EGYPT_CORE.formatCurrency(balance.assets.current.cash)}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>العملاء (مدينون)</span>
+                                            <span>${APP_EGYPT_CORE.formatCurrency(balance.assets.current.accountsReceivable)}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>خطابات الضمان</span>
+                                            <span>${APP_EGYPT_CORE.formatCurrency(balance.assets.current.guarantees)}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>المخزون</span>
+                                            <span>${APP_EGYPT_CORE.formatCurrency(balance.assets.current.inventory)}</span>
+                                        </div>
+                                        <div class="divider my-1"></div>
+                                        <div class="flex justify-between font-bold">
+                                            <span>إجمالي الأصول المتداولة</span>
+                                            <span>${APP_EGYPT_CORE.formatCurrency(balance.assets.current.total)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-bold mb-2">الأصول الثابتة</h4>
+                                    <div class="space-y-1 text-sm">
+                                        <div class="flex justify-between">
+                                            <span>المعدات</span>
+                                            <span>${APP_EGYPT_CORE.formatCurrency(balance.assets.fixed.equipment)}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>الأثاث</span>
+                                            <span>${APP_EGYPT_CORE.formatCurrency(balance.assets.fixed.furniture)}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>السيارات</span>
+                                            <span>${APP_EGYPT_CORE.formatCurrency(balance.assets.fixed.vehicles)}</span>
+                                        </div>
+                                        <div class="divider my-1"></div>
+                                        <div class="flex justify-between font-bold">
+                                            <span>إجمالي الأصول الثابتة</span>
+                                            <span>${APP_EGYPT_CORE.formatCurrency(balance.assets.fixed.total)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-success text-white p-4 rounded-lg">
+                                    <div class="flex justify-between text-lg font-bold">
+                                        <span>إجمالي الأصول</span>
+                                        <span>${APP_EGYPT_CORE.formatCurrency(balance.assets.total)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Liabilities & Equity -->
+                    <div class="card bg-white shadow-xl">
+                        <div class="card-body">
+                            <h3 class="card-title text-xl mb-4 text-error">الخصوم وحقوق الملكية</h3>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <h4 class="font-bold mb-2">الالتزامات المتداولة</h4>
+                                    <div class="space-y-1 text-sm">
+                                        <div class="flex justify-between">
+                                            <span>الموردون (دائنون)</span>
+                                            <span>${APP_EGYPT_CORE.formatCurrency(balance.liabilities.current.accountsPayable)}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>الضرائب المستحقة</span>
+                                            <span>${APP_EGYPT_CORE.formatCurrency(balance.liabilities.current.taxPayable)}</span>
+                                        </div>
+                                        <div class="divider my-1"></div>
+                                        <div class="flex justify-between font-bold">
+                                            <span>إجمالي الالتزامات المتداولة</span>
+                                            <span>${APP_EGYPT_CORE.formatCurrency(balance.liabilities.current.total)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-bold mb-2">الالتزامات طويلة الأجل</h4>
+                                    <div class="space-y-1 text-sm">
+                                        <div class="flex justify-between">
+                                            <span>القروض طويلة الأجل</span>
+                                            <span>${APP_EGYPT_CORE.formatCurrency(balance.liabilities.longTerm.longTermLoans)}</span>
+                                        </div>
+                                        <div class="divider my-1"></div>
+                                        <div class="flex justify-between font-bold">
+                                            <span>إجمالي الالتزامات طويلة الأجل</span>
+                                            <span>${APP_EGYPT_CORE.formatCurrency(balance.liabilities.longTerm.total)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-bold mb-2">حقوق الملكية</h4>
+                                    <div class="space-y-1 text-sm">
+                                        <div class="flex justify-between">
+                                            <span>رأس المال</span>
+                                            <span>${APP_EGYPT_CORE.formatCurrency(balance.equity.capital)}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>الأرباح المحتجزة</span>
+                                            <span>${APP_EGYPT_CORE.formatCurrency(balance.equity.retainedEarnings)}</span>
+                                        </div>
+                                        <div class="divider my-1"></div>
+                                        <div class="flex justify-between font-bold">
+                                            <span>إجمالي حقوق الملكية</span>
+                                            <span>${APP_EGYPT_CORE.formatCurrency(balance.equity.total)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-error text-white p-4 rounded-lg">
+                                    <div class="flex justify-between text-lg font-bold">
+                                        <span>إجمالي الخصوم وحقوق الملكية</span>
+                                        <span>${APP_EGYPT_CORE.formatCurrency(balance.totalLiabilitiesAndEquity)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        function renderTaxReport() {
+            const tax = APP_EGYPT_REPORTS.generateTaxReport(2025);
+            const container = document.getElementById('tax-report-content');
+            
+            const html = `
+                <div class="card bg-white shadow-xl">
+                    <div class="card-body">
+                        <div class="space-y-6">
+                            <!-- VAT Section -->
+                            <div>
+                                <h3 class="text-xl font-bold mb-4">ضريبة القيمة المضافة (14%)</h3>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between">
+                                        <span>ضريبة المبيعات</span>
+                                        <span class="font-bold text-success">${APP_EGYPT_CORE.formatCurrency(tax.vat.salesVAT)}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>ضريبة المشتريات</span>
+                                        <span class="font-bold text-error">(${APP_EGYPT_CORE.formatCurrency(tax.vat.purchasesVAT)})</span>
+                                    </div>
+                                    <div class="divider"></div>
+                                    <div class="flex justify-between text-lg">
+                                        <span class="font-bold">صافي ضريبة القيمة المضافة المستحقة</span>
+                                        <span class="font-bold text-info">${APP_EGYPT_CORE.formatCurrency(tax.vat.netVATPayable)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Income Tax Section -->
+                            <div>
+                                <h3 class="text-xl font-bold mb-4">ضريبة الأرباح التجارية (1%)</h3>
+                                <div class="flex justify-between text-lg">
+                                    <span class="font-bold">إجمالي ضريبة الأرباح التجارية</span>
+                                    <span class="font-bold text-warning">${APP_EGYPT_CORE.formatCurrency(tax.incomeTax.total)}</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Total Tax -->
+                            <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-lg">
+                                <div class="flex justify-between text-2xl">
+                                    <span class="font-bold">إجمالي الضرائب المستحقة</span>
+                                    <span class="font-bold">${APP_EGYPT_CORE.formatCurrency(tax.totalTaxPayable)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        function renderCashFlowReport() {
+            const cashflow = APP_EGYPT_REPORTS.generateCashFlowStatement(2025);
+            const container = document.getElementById('cashflow-content');
+            
+            const html = `
+                <div class="card bg-white shadow-xl">
+                    <div class="card-body">
+                        <div class="space-y-6">
+                            <!-- Operating Activities -->
+                            <div>
+                                <h3 class="text-xl font-bold mb-4">التدفقات النقدية من الأنشطة التشغيلية</h3>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex justify-between">
+                                        <span>التحصيلات من المبيعات</span>
+                                        <span class="text-success">${APP_EGYPT_CORE.formatCurrency(cashflow.operatingActivities.cashFromSales)}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>المدفوعات للمشتريات</span>
+                                        <span class="text-error">(${APP_EGYPT_CORE.formatCurrency(Math.abs(cashflow.operatingActivities.cashToPurchases))})</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>المدفوعات للمصروفات</span>
+                                        <span class="text-error">(${APP_EGYPT_CORE.formatCurrency(Math.abs(cashflow.operatingActivities.cashToExpenses))})</span>
+                                    </div>
+                                    <div class="divider my-1"></div>
+                                    <div class="flex justify-between font-bold">
+                                        <span>صافي التدفقات من الأنشطة التشغيلية</span>
+                                        <span class="${cashflow.operatingActivities.netCashFromOperations >= 0 ? 'text-success' : 'text-error'}">
+                                            ${APP_EGYPT_CORE.formatCurrency(cashflow.operatingActivities.netCashFromOperations)}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Investing Activities -->
+                            <div>
+                                <h3 class="text-xl font-bold mb-4">التدفقات النقدية من الأنشطة الاستثمارية</h3>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex justify-between">
+                                        <span>شراء أصول ثابتة</span>
+                                        <span class="text-error">(${APP_EGYPT_CORE.formatCurrency(Math.abs(cashflow.investingActivities.purchaseOfAssets))})</span>
+                                    </div>
+                                    <div class="divider my-1"></div>
+                                    <div class="flex justify-between font-bold">
+                                        <span>صافي التدفقات من الأنشطة الاستثمارية</span>
+                                        <span class="text-error">${APP_EGYPT_CORE.formatCurrency(cashflow.investingActivities.netCashFromInvesting)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Financing Activities -->
+                            <div>
+                                <h3 class="text-xl font-bold mb-4">التدفقات النقدية من الأنشطة التمويلية</h3>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex justify-between">
+                                        <span>مساهمات رأس المال (إيداع الشريك رشاد)</span>
+                                        <span class="text-success">${APP_EGYPT_CORE.formatCurrency(cashflow.financingActivities.capitalContributions)}</span>
+                                    </div>
+                                    <div class="divider my-1"></div>
+                                    <div class="flex justify-between font-bold">
+                                        <span>صافي التدفقات من الأنشطة التمويلية</span>
+                                        <span class="text-success">${APP_EGYPT_CORE.formatCurrency(cashflow.financingActivities.netCashFromFinancing)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Summary -->
+                            <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-lg">
+                                <div class="space-y-2">
+                                    <div class="flex justify-between">
+                                        <span>صافي التغير في النقدية</span>
+                                        <span class="font-bold">${APP_EGYPT_CORE.formatCurrency(cashflow.netCashChange)}</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm opacity-90">
+                                        <span>رصيد النقدية في بداية العام</span>
+                                        <span>${APP_EGYPT_CORE.formatCurrency(cashflow.openingBalance)}</span>
+                                    </div>
+                                    <div class="divider my-1 bg-white opacity-30"></div>
+                                    <div class="flex justify-between text-xl">
+                                        <span class="font-bold">رصيد النقدية في نهاية العام</span>
+                                        <span class="font-bold">${APP_EGYPT_CORE.formatCurrency(cashflow.closingBalance)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+    })();
+    </script>
+
+</body>
+</html>
