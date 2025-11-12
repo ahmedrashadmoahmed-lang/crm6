@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🇪🇬 المصروفات - نظام محاسبي مصري</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body class="rtl bg-gray-50">
+
+    <!-- Navigation -->
+    <nav class="navbar bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-xl sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex-1">
+                <a href="egypt-dashboard.html" class="btn btn-ghost normal-case text-xl">
+                    <i class="bi bi-calculator"></i>
+                    <span class="mr-2">نظام محاسبي مصري 🇪🇬</span>
+                </a>
+            </div>
+            <div class="flex-none">
+                <ul class="menu menu-horizontal px-1">
+                    <li><a href="egypt-dashboard.html"><i class="bi bi-speedometer2"></i> لوحة التحكم</a></li>
+                    <li><a href="egypt-sales.html"><i class="bi bi-cart-check"></i> المبيعات</a></li>
+                    <li><a href="egypt-purchases.html"><i class="bi bi-bag"></i> المشتريات</a></li>
+                    <li><a href="egypt-expenses.html" class="active"><i class="bi bi-cash-coin"></i> المصروفات</a></li>
+                    <li><a href="egypt-reports.html"><i class="bi bi-file-earmark-text"></i> التقارير</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="space-y-6">
+            <!-- Header -->
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold">💰 إدارة المصروفات</h1>
+                    <p class="text-gray-600 mt-1">تتبع المصروفات السنوية 2025</p>
+                </div>
+                <div class="space-x-2 space-x-reverse">
+                    <button class="btn btn-success" onclick="APP_EGYPT_EXPENSES.exportToExcel(2025)">
+                        <i class="bi bi-file-earmark-excel"></i>
+                        تصدير Excel
+                    </button>
+                    <button class="btn btn-primary" onclick="openNewExpenseModal()">
+                        <i class="bi bi-plus-lg"></i>
+                        مصروف جديد
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="card bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-xl">
+                    <div class="card-body">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm opacity-90">إجمالي المصروفات</p>
+                                <p class="text-2xl font-bold" id="total-expenses">0 ج.م</p>
+                                <p class="text-xs opacity-75">السنة 2025</p>
+                            </div>
+                            <i class="bi bi-cash-coin text-4xl opacity-30"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card bg-white shadow-lg">
+                    <div class="card-body">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">عدد المصروفات</p>
+                                <p class="text-2xl font-bold text-primary" id="expense-count">0</p>
+                            </div>
+                            <i class="bi bi-list-ul text-4xl text-primary opacity-20"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card bg-white shadow-lg">
+                    <div class="card-body">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">المدفوع</p>
+                                <p class="text-2xl font-bold text-success" id="paid-amount">0 ج.م</p>
+                            </div>
+                            <i class="bi bi-check-circle text-4xl text-success opacity-20"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card bg-white shadow-lg">
+                    <div class="card-body">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">المعلق</p>
+                                <p class="text-2xl font-bold text-warning" id="pending-amount">0 ج.م</p>
+                            </div>
+                            <i class="bi bi-clock text-4xl text-warning opacity-20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="card bg-white shadow-xl">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">المصروفات حسب الفئة</h2>
+                    <canvas id="expenses-category-chart" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- Expenses Table -->
+            <div class="card bg-white shadow-xl">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">قائمة المصروفات</h2>
+                    
+                    <!-- Filters -->
+                    <div class="flex gap-4 mb-4">
+                        <select class="select select-bordered" id="filter-year" onchange="filterExpenses()">
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                        </select>
+                        <select class="select select-bordered" id="filter-month" onchange="filterExpenses()">
+                            <option value="">جميع الأشهر</option>
+                            <option value="1">يناير</option>
+                            <option value="2">فبراير</option>
+                            <option value="3">مارس</option>
+                            <option value="4">أبريل</option>
+                            <option value="5">مايو</option>
+                            <option value="6">يونيو</option>
+                            <option value="7">يوليو</option>
+                            <option value="8">أغسطس</option>
+                            <option value="9">سبتمبر</option>
+                            <option value="10">أكتوبر</option>
+                            <option value="11">نوفمبر</option>
+                            <option value="12">ديسمبر</option>
+                        </select>
+                        <select class="select select-bordered" id="filter-category" onchange="filterExpenses()">
+                            <option value="">جميع الفئات</option>
+                        </select>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="table table-zebra w-full">
+                            <thead>
+                                <tr>
+                                    <th>التاريخ</th>
+                                    <th>الفئة</th>
+                                    <th>الوصف</th>
+                                    <th>المبلغ</th>
+                                    <th>طريقة الدفع</th>
+                                    <th>الحالة</th>
+                                    <th>إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expenses-list">
+                                <tr>
+                                    <td colspan="7" class="text-center py-12">
+                                        <span class="loading loading-spinner loading-lg text-primary"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer footer-center p-10 bg-base-200 text-base-content mt-12">
+        <div>
+            <p class="font-bold">نظام محاسبي مصري متكامل - CRM6 🇪🇬</p>
+            <p>© 2025 - جميع الحقوق محفوظة</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Files -->
+    <script src="js/app-egypt-core.js"></script>
+    <script src="js/app-egypt-expenses.js"></script>
+
+    <script>
+    (function() {
+        'use strict';
+        
+        let expensesChart = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('💰 تحميل صفحة المصروفات...');
+            
+            try {
+                // Initialize modules
+                APP_EGYPT_CORE.initialize();
+                const expensesInit = APP_EGYPT_EXPENSES.initialize();
+                
+                console.log('✅ تم تهيئة نظام المصروفات:', expensesInit);
+                
+                // Populate category filter
+                populateCategoryFilter();
+                
+                // Update statistics
+                updateStatistics();
+                
+                // Render expenses list
+                APP_EGYPT_EXPENSES.renderExpensesList('expenses-list');
+                
+                // Render chart
+                renderExpensesChart();
+                
+                console.log('✅ تم تحميل المصروفات بنجاح');
+                
+            } catch (error) {
+                console.error('❌ خطأ:', error);
+                document.getElementById('expenses-list').innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center text-error">
+                            خطأ في تحميل البيانات: ${error.message}
+                        </td>
+                    </tr>
+                `;
+            }
+        });
+        
+        function populateCategoryFilter() {
+            const select = document.getElementById('filter-category');
+            for (const key in APP_EGYPT_EXPENSES.EXPENSE_CATEGORIES) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = APP_EGYPT_EXPENSES.EXPENSE_CATEGORIES[key];
+                select.appendChild(option);
+            }
+        }
+        
+        function updateStatistics() {
+            const stats = APP_EGYPT_EXPENSES.getExpenseStatistics(2025);
+            
+            document.getElementById('total-expenses').textContent = 
+                APP_EGYPT_CORE.formatCurrency(stats.totalExpenses, false);
+            document.getElementById('expense-count').textContent = stats.totalCount;
+            document.getElementById('paid-amount').textContent = 
+                APP_EGYPT_CORE.formatCurrency(stats.paidAmount, false);
+            document.getElementById('pending-amount').textContent = 
+                APP_EGYPT_CORE.formatCurrency(stats.pendingAmount, false);
+        }
+        
+        function renderExpensesChart() {
+            const canvas = document.getElementById('expenses-category-chart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            const categories = APP_EGYPT_EXPENSES.getExpensesByCategory(2025);
+            
+            if (expensesChart) {
+                expensesChart.destroy();
+            }
+            
+            expensesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: categories.map(c => c.name),
+                    datasets: [{
+                        label: 'المبلغ (ج.م)',
+                        data: categories.map(c => c.total),
+                        backgroundColor: 'rgba(249, 115, 22, 0.7)',
+                        borderColor: 'rgb(249, 115, 22)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return APP_EGYPT_CORE.formatCurrency(value, false);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        window.filterExpenses = function() {
+            const year = parseInt(document.getElementById('filter-year').value);
+            const month = document.getElementById('filter-month').value;
+            const category = document.getElementById('filter-category').value;
+            
+            const filters = { year };
+            if (month) filters.month = parseInt(month);
+            if (category) filters.category = category;
+            
+            APP_EGYPT_EXPENSES.renderExpensesList('expenses-list', filters);
+            updateStatistics();
+        };
+        
+        window.openNewExpenseModal = function() {
+            alert('نموذج إضافة مصروف جديد - قيد التطوير');
+        };
+        
+    })();
+    </script>
+
+</body>
+</html>
