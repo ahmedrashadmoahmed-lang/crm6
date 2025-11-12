@@ -388,7 +388,11 @@
 
             // Count by category
             const categories = { excellent: 0, good: 0, average: 0, poor: 0 };
-            analysis.analyzed.forEach(s => {
+            analysis.analyzed.forEach((s, index) => {
+                if (!s || !s.category || !s.category.name) {
+                    console.warn(`⚠️ Supplier at index ${index} is missing data, skipping`);
+                    return;
+                }
                 const cat = s.category.name.toLowerCase();
                 categories[cat] = (categories[cat] || 0) + 1;
             });
